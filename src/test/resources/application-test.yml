@@ -1,0 +1,28 @@
+#Spring
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: test
+    password: test
+    hikari:
+      maximum-pool-size: 10
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  kafka:
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+    producer:
+      bootstrap-servers: localhost:9093
+
+#Logging
+logging:
+  level:
+    org:
+      springframework: INFO

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-file-process
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - file-process-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-file-process
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - file-process-network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-file-process
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: file_processing
+    ports:
+      - "5432:5432"
+    networks:
+      - file-process-network
+
+  app:
+    image: backend-file-process
+    build: .
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - file-process-network
+
+networks:
+  file-process-network:
+    driver: bridge
